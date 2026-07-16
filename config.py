@@ -5,7 +5,7 @@ import os
 # Polza.ai — унифицированный OpenAI-совместимый API, работает из РФ без VPN
 POLZA_API_KEY = os.environ.get("POLZA_API_KEY", "")
 POLZA_BASE_URL = "https://polza.ai/api/v1"
-POLZA_MODEL = os.environ.get("POLZA_MODEL", "gpt-4o-mini")  # см. каталог моделей в консоли polza.ai
+POLZA_MODEL = os.environ.get("POLZA_MODEL", "openai/gpt-4o-mini")  # см. каталог моделей в консоли polza.ai
 
 # Telegram Bot API
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
