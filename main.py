@@ -16,7 +16,7 @@ import json
 import os
 from datetime import datetime, timezone
 
-from config import TOPICS, TOPICS_POOL_FILE, TOPICS_REFILL_BATCH, TOPICS_REFILL_THRESHOLD, PRODUCT_URLS_POOL
+from config import TOPICS, TOPICS_POOL_FILE, TOPICS_REFILL_BATCH, TOPICS_REFILL_THRESHOLD, PRODUCT_URLS_POOL, SITE_BASE_URL, ARTICLES_DIR
 from content_generator import generate_article
 from affiliate_links import generate_deeplink, format_disclosure
 from telegram_poster import post_to_telegram
