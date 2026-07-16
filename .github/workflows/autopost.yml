@@ -33,6 +33,7 @@ jobs:
           ADMITAD_WEBSITE_ID: ${{ secrets.ADMITAD_WEBSITE_ID }}
           ADMITAD_CAMPAIGN_ID: ${{ secrets.ADMITAD_CAMPAIGN_ID }}
           SITE_BASE_URL: ${{ secrets.SITE_BASE_URL }}
+          PROXY_URL: ${{ secrets.PROXY_URL }}
         run: python main.py
 
       - name: Commit generated files
