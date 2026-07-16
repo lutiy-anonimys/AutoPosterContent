@@ -27,6 +27,8 @@ def find_products(query: str, limit: int = 5) -> list:
 
     # --- Настройка прокси (берем из GitHub Secrets) ---
     proxy_url = os.environ.get("PROXY_URL", "").strip()
+    
+    # Формируем словарь прокси для requests
     proxies = {
         "http": proxy_url,
         "https": proxy_url
@@ -34,11 +36,34 @@ def find_products(query: str, limit: int = 5) -> list:
 
     if proxy_url:
         print("[product_finder] Запросы отправляются через прокси")
+        try:
+            ip_check = requests.get("https://api.ipify.org?format=json", proxies=proxies, timeout=5).json()
+            print(f"[product_finder] Внешний IP через прокси: {ip_check.get('ip')}")
+        except Exception as check_err:
+            print(f"[product_finder] Предупреждение: не удалось проверить IP через прокси: {check_err}")
     else:
         print("[product_finder] Предупреждение: PROXY_URL не задан, запросы идут напрямую")
 
     # --- ЧАСТЬ 1. Поиск конкретных товаров на Wildberries ---
     try:
+        # Эмулируем абсолютно чистый и полный набор заголовков современного браузера Chrome
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+            ),
+            "Accept": "*/*",
+            "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Origin": "https://www.wildberries.ru",
+            "Referer": "https://www.wildberries.ru/",
+            "Sec-Ch-Ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": '"Windows"',
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "cross-site",
+        }
+
         resp = requests.get(
             WB_SEARCH_URL,
             params={
@@ -51,14 +76,7 @@ def find_products(query: str, limit: int = 5) -> list:
                 "sort": "popular",
                 "spp": 30,
             },
-            headers={
-                "User-Agent": (
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-                ),
-                "Accept": "application/json, text/plain, */*",
-                "Referer": "https://www.wildberries.ru/",
-            },
+            headers=headers,
             proxies=proxies,
             timeout=15,
         )
@@ -80,8 +98,6 @@ def find_products(query: str, limit: int = 5) -> list:
         print(f"[product_finder] Не удалось получить конкретные товары с Wildberries для запроса '{query}': {e}")
 
     # --- ЧАСТЬ 2. Добавление поиска на Ozon ---
-    # У Ozon закрытое API с защитой от Cloudflare, поэтому надежнее всего генерировать
-    # правильную, готовую ссылку на страницу поиска Ozon по этому запросу.
     try:
         encoded_query = urllib.parse.quote(query)
         ozon_search_url = f"https://www.ozon.ru/search/?text={encoded_query}&from_global=true"
