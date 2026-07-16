@@ -1,0 +1,41 @@
+name: Autopost content
+
+on:
+  schedule:
+    - cron: "0 12 * * *"   # каждый день в 12:00
+  workflow_dispatch: {}       # + возможность запустить руками из вкладки Actions
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run pipeline
+        env:
+          POLZA_API_KEY: ${{ secrets.POLZA_API_KEY }}
+          POLZA_MODEL: ${{ vars.POLZA_MODEL }}   # необязательно; по умолчанию gpt-4o-mini
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          ADMITAD_TOKEN: ${{ secrets.ADMITAD_TOKEN }}
+          ADMITAD_WEBSITE_ID: ${{ secrets.ADMITAD_WEBSITE_ID }}
+          ADMITAD_CAMPAIGN_ID: ${{ secrets.ADMITAD_CAMPAIGN_ID }}
+          SITE_BASE_URL: ${{ secrets.SITE_BASE_URL }}
+        run: python main.py
+
+      - name: Commit generated files
+        run: |
+          git config user.name "autopost-bot"
+          git config user.email "actions@github.com"
+          git add output/
+          git commit -m "Автопубликация: $(date -u +%Y-%m-%dT%H:%M:%SZ)" || echo "Нет изменений"
+          git push
