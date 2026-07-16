@@ -73,6 +73,10 @@ def generate_article(topic: str, min_words: int = 400) -> dict:
         },
         timeout=60,
     )
+    if resp.status_code >= 400:
+        # Показываем тело ответа в логах — иначе raise_for_status() скрывает причину
+        # (например, неверный формат model, нехватка баланса, невалидный ключ и т.п.)
+        print(f"[content_generator] Polza.ai вернул {resp.status_code}: {resp.text[:500]}")
     resp.raise_for_status()
     data = resp.json()
 

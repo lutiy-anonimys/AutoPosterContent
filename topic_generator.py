@@ -65,6 +65,8 @@ def generate_new_topics(used_topics: list, batch_size: int = 8) -> list:
         },
         timeout=60,
     )
+    if resp.status_code >= 400:
+        print(f"[topic_generator] Polza.ai вернул {resp.status_code}: {resp.text[:500]}")
     resp.raise_for_status()
     data = resp.json()
 
