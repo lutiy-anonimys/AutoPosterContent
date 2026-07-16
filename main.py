@@ -90,13 +90,17 @@ def run_once():
     raw_link, product_name = pick_product_link(article.get("product_query", ""), topic)
     aff_link = generate_deeplink(raw_link)
 
-    preview = article["body_plain"][:700]
-    product_line = f"🛍️ {product_name}\n\n" if product_name else ""
+    # Делаем ультра-короткий анонс статьи: берем только первое предложение (около 150-200 символов)
+    sentences = article["body_plain"].split(".")
+    preview = sentences[0].strip() + "." if sentences else "Интересная находка для вашего интерьера!"
+
+    # Формируем аккуратный, короткий пост-карточку для Telegram
     telegram_text = (
-        f"✍️ <b>{article['title']}</b>\n\n"
-        f"{preview}...\n\n"
-        f"{product_line}"
-        f'👉 <a href="{aff_link}">Смотреть предложение</a>'
+        f"🌿 <b>{article['title']}</b>\n\n"
+        f"{preview}\n\n"
+        f"✨ <b>Находка дня:</b> {product_name or 'Стильный органайзер'}\n"
+        f'👉 <a href="{aff_link}"><b>Посмотреть товар на WB/Ozon</b></a>\n\n'
+        f'📖 <a href="{SITE_BASE_URL}/{ARTICLES_DIR}/{slug}.html">Читать полную статью в блоге</a>'
     )
     telegram_text = format_disclosure(telegram_text)
 
