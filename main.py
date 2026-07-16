@@ -103,7 +103,17 @@ def run_once():
     ok = post_to_telegram(telegram_text)
     print(f"[main] Публикация в Telegram: {'успех' if ok else 'ошибка'}")
 
-    save_article_html(slug, article["title"], article["body_html"])
+    # Красивый призыв подписаться на ТГ-канал в конце статьи для Дзена
+    telegram_promo = (
+        '<hr><p>🔥 <b>Понравилась подборка?</b> Еще больше стильных находок, '
+        'обзоров и секретных промокодов для Ozon и Wildberries мы публикуем в нашем '
+        'Telegram-канале <a href="https://t.me/gnezdonahodki"><b>Гнездо: Находки для уютного дома 🌿</b></a>. '
+        'Подписывайтесь, чтобы обустроить уютный дом без лишних трат!</p>'
+    )
+    dzen_html = article["body_html"] + telegram_promo
+
+    # Сохраняем статью для Дзена уже с рекламой ТГ-канала
+    save_article_html(slug, article["title"], dzen_html)
 
     # Добавляем новую статью в начало истории, убираем дубли по slug, ограничиваем размер
     new_entry = {
